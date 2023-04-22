@@ -168,6 +168,14 @@ namespace NSwag.CodeGeneration.Models
         /// <summary>Gets or sets the parameters.</summary>
         public IList<TParameterModel> Parameters { get; protected set; }
 
+        /// <summary>Gets a value indicating whether the operation has server overrides defined.</summary>
+        public bool HasServers => Servers.Count > 0;
+
+        /// <summary>Gets the operation's server overrides.</summary>
+        public ICollection<OpenApiServer> Servers => _operation.Servers;
+
+        public string BaseUrl { get; protected set; }
+
         /// <summary>Gets a value indicating whether the operation has only a default response.</summary>
         public bool HasOnlyDefaultResponse => Responses.Count == 0 && HasDefaultResponse;
 

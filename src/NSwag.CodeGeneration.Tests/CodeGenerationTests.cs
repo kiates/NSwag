@@ -308,6 +308,23 @@ public static Person FromJson(string data)
             Assert.Equal(expectedClientName, clientName);
         }
 
+        [Fact]
+        public void When_generating_CSharp_code_with_SystemTextJson_then_output_contains_expected_code2()
+        {
+            // Arrange
+            var document = CreateDocumentWithOverridenServers();
+
+            // Act
+            var settings = new CSharpClientGeneratorSettings();
+            settings.CSharpGeneratorSettings.JsonLibrary = NJsonSchema.CodeGeneration.CSharp.CSharpJsonLibrary.SystemTextJson;
+
+            var generator = new CSharpClientGenerator(document, settings);
+            var code = generator.GenerateFile();
+
+            // Assert
+            Assert.Contains(@"string baseUrl_ = ""https://overridden.server.com"";", code);
+        }
+
         private static OpenApiDocument CreateDocument()
         {
             var document = new OpenApiDocument();
@@ -329,6 +346,40 @@ public static Person FromJson(string data)
                         }
                     }
                 }
+            };
+            return document;
+        }        
+        
+        private static OpenApiDocument CreateDocumentWithOverridenServers()
+        {
+            var document = new OpenApiDocument();
+            var settings = new JsonSchemaGeneratorSettings();
+            var generator = new JsonSchemaGenerator(settings);
+
+            document.Paths["/Person"] = new OpenApiPathItem();
+            document.Paths["/Person"][OpenApiOperationMethod.Get] = new OpenApiOperation
+            {
+                Responses =
+                {
+                    {
+                        "200", new OpenApiResponse
+                        {
+                            Schema = new JsonSchema
+                            {
+                                Reference = generator.Generate(typeof(Person), new OpenApiSchemaResolver(document, settings))
+                            }
+                        }
+                    }
+                },
+                Servers =
+                {
+                    new OpenApiServer
+                    {
+                        Url="https://overridden.server.com",
+                        Description = ""
+                    }
+                }
+
             };
             return document;
         }

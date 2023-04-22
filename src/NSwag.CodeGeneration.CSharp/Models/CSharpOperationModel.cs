@@ -82,6 +82,8 @@ namespace NSwag.CodeGeneration.CSharp.Models
                         _generator,
                         _resolver))
                 .ToList();
+
+            BaseUrl = _operation.Servers.Count > 0 ? _operation.Servers.First().Url : "";
         }
 
         /// <summary>Gets the method's access modifier.</summary>

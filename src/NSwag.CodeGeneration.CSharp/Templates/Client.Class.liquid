@@ -138,7 +138,12 @@
 
 {%     endif -%}
         var urlBuilder_ = new System.Text.StringBuilder();
-        urlBuilder_.Append({% if UseBaseUrl %}BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/{% else %}"{% endif %}{{ operation.Path }}{% if operation.HasQueryParameters %}?{% endif %}");
+{%     if operation.HasServers -%}
+		string baseUrl_ = "{{operation.BaseUrl}}";
+{%     elsif UseBaseUrl -%}
+		string baseUrl_ = BaseUrl;
+{%     endif -%}
+        urlBuilder_.Append({% if UseBaseUrl %}baseUrl_ != null ? baseUrl_.TrimEnd('/') : "").Append("/{% else %}"{% endif %}{{ operation.Path }}{% if operation.HasQueryParameters %}?{% endif %}");
 {%     for parameter in operation.PathParameters -%}
 {%         if parameter.IsOptional -%}
         if ({{ parameter.VariableName }} != null)
